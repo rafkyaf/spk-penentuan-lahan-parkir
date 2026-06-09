@@ -65,36 +65,37 @@ async function initMap() {
   const mapEl = document.getElementById("map");
   if (!mapEl) return;
 
-  map = L.map("map", { zoomControl: true, attributionControl: true }).setView([-6.9175, 107.6075], 13);
+  // 1. Jaga-jaga agar Leaflet tidak crash karena map dibuat 2 kali
+  if (!map) {
+    map = L.map("map", { zoomControl: true, attributionControl: true }).setView([-6.9175, 107.6075], 13);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: '© <a href="https://carto.com/">CARTO</a>',
+      subdomains: "abcd", maxZoom: 19,
+    }).addTo(map);
 
-  // Tile layer gelap
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-    attribution: '© <a href="https://carto.com/">CARTO</a>',
-    subdomains: "abcd",
-    maxZoom: 19,
-  }).addTo(map);
+    addKeramaianPoints(); // Panggil titik keramaian cukup 1x
+  }
 
-  // Load GeoJSON (Gunakan await agar proses sinkron/menunggu)
+  // 2. Jika layer geojson sudah ada (saat di-refresh), hapus dulu yang lama
+  if (geojsonLayer) {
+    map.removeLayer(geojsonLayer);
+  }
+
+  // 3. Load GeoJSON dengan trik anti-cache (?t=waktu_sekarang)
   try {
-    const response = await fetch("/static/data/lahan_parkir.geojson");
+    const response = await fetch("/static/data/lahan_parkir.geojson?t=" + new Date().getTime());
     const data = await response.json();
 
     geojsonLayer = L.geoJSON(data, {
-      // (Biarkan fungsi style yang lama tetap ada untuk polygon)
       style: (feature) => ({
         fillColor: feature.properties.warna,
         color: "#fff", weight: 2, opacity: 0.8, fillOpacity: 0.7,
       }),
-
-      // ++ TAMBAHKAN FUNGSI INI UNTUK MENANGANI TITIK (MARKER) ++
       pointToLayer: function (feature, latlng) {
         const warna = feature.properties.warna;
-        // Membuat marker berbentuk lingkaran dengan warna sesuai perhitungan
         const customIcon = L.divIcon({
           html: `<div style="background:${warna};width:24px;height:24px;border-radius:50%;border:2px solid white;box-shadow: 0 2px 4px rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; color:white; font-size:10px; font-weight:bold;">P</div>`,
-          className: "",
-          iconSize: [24, 24],
-          iconAnchor: [12, 12]
+          className: "", iconSize: [24, 24], iconAnchor: [12, 12]
         });
         return L.marker(latlng, { icon: customIcon });
       },
@@ -102,8 +103,7 @@ async function initMap() {
         const p = feature.properties;
         const kat = getKategori(p.skor_akhir);
         layer.bindPopup(
-          `
-          <div class="popup-header">🅿 ${p.nama}</div>
+          `<div class="popup-header">🅿 ${p.nama}</div>
           <div class="popup-row"><span class="popup-key">Ranking</span><span class="popup-val">#${p.ranking}</span></div>
           <div class="popup-row"><span class="popup-key">Skor AHP</span><span class="popup-val">${p.skor_akhir.toFixed(3)}</span></div>
           <div class="popup-row"><span class="popup-key">Kategori</span><span class="badge ${kat.cls}">${kat.label}</span></div>
@@ -111,29 +111,23 @@ async function initMap() {
           <div class="popup-row"><span class="popup-key">Jarak Keramaian</span><span class="popup-val">${p.jarak_keramaian} m</span></div>
           <div class="popup-row"><span class="popup-key">Kepadatan Jalan</span><span class="popup-val">${formatAngka(p.kepadatan_jalan)} unit/hr</span></div>
           <div class="popup-row"><span class="popup-key">Luas Lahan</span><span class="popup-val">${formatAngka(p.luas_lahan)} m²</span></div>
-          <div class="popup-row"><span class="popup-key">Harga Lahan</span><span class="popup-val">${formatRupiah(p.harga_lahan)}/m²</span></div>
-        `,
-          { maxWidth: 280 },
+          <div class="popup-row"><span class="popup-key">Harga Lahan</span><span class="popup-val">${formatRupiah(p.harga_lahan)}/m²</span></div>`,
+          { maxWidth: 280 }
         );
 
         layer.on("mouseover", function () {
-          this.setStyle({ weight: 3, fillOpacity: 0.9 });
+          if (this.setStyle) this.setStyle({ weight: 3, fillOpacity: 0.9 });
         });
         layer.on("mouseout", function () {
-          geojsonLayer.resetStyle(this);
+          if (geojsonLayer.resetStyle) geojsonLayer.resetStyle(this);
         });
       },
     }).addTo(map);
 
-    // Fit bounds
     map.fitBounds(geojsonLayer.getBounds(), { padding: [40, 40] });
   } catch (err) {
-    // Fallback: render manual jika geojson gagal load
-    renderManualMarkers();
+    console.error("Gagal memuat peta:", err);
   }
-
-  // Tambahkan titik pusat keramaian (Point)
-  addKeramaianPoints();
 }
 
 function renderManualMarkers() {
@@ -635,6 +629,14 @@ function updateDashboardStats(ahp, rankingData) {
   const elStatCR = document.getElementById("stat-cr");
   const elStatTerbaik = document.getElementById("stat-terbaik");
   const elIndexAlert = document.getElementById("index-cr-alert");
+
+  // ++ TAMBAHAN BARU: Tangkap ID untuk total lahan ++
+  const elStatTotal = document.getElementById("stat-total-lahan");
+
+  // ++ TAMBAHAN BARU: Update angka total lahan sesuai jumlah data ++
+  if (elStatTotal) {
+    elStatTotal.innerText = rankingData.length;
+  }
 
   // Update angka CR di kartu atas
   if (elStatCR) elStatCR.innerText = ahp.CR.toFixed(3);

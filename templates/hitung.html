@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SPK Parkir Bandung | Perhitungan AHP</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a class="navbar-brand" href="/">
+        <div class="logo-icon">🅿</div>
+        <div>
+          <span class="brand-name">SPK Parkir Bandung</span>
+          <span class="brand-sub">Web GIS + AHP System</span>
+        </div>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="/">Dashboard</a></li>
+        <li><a href="/hitung" class="active">Perhitungan AHP</a></li>
+        <li><a href="/#peta">Peta GIS</a></li>
+        <li><a href="/#ranking">Ranking</a></li>
+      </ul>
+    </nav>
+
+    <div class="page-header">
+      <div class="container">
+        <h1 class="page-title fade-up">Kalkulator AHP</h1>
+        <p class="page-subtitle fade-up fade-up-1">Analytical Hierarchy Process — Pembobotan Kriteria Penentuan Lokasi Parkir</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="card mb-24 fade-up">
+        <div class="section-header">
+          <div class="section-title">Skala Penilaian Saaty (1–9)</div>
+        </div>
+        <div style="overflow-x: auto">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>Nilai</th>
+                <th>Arti</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-mono fw-700 text-accent">1</td>
+                <td>Sama Penting</td>
+                <td>Kedua elemen sama pentingnya</td>
+              </tr>
+              <tr>
+                <td class="text-mono fw-700">2</td>
+                <td>Sedikit Lebih Penting</td>
+                <td>Elemen A sedikit lebih penting</td>
+              </tr>
+              <tr>
+                <td class="text-mono fw-700">3</td>
+                <td>Lebih Penting</td>
+                <td>Pengalaman menunjukkan satu lebih penting</td>
+              </tr>
+              <tr>
+                <td class="text-mono fw-700">5</td>
+                <td>Jauh Lebih Penting</td>
+                <td>Satu elemen sangat disukai</td>
+              </tr>
+              <tr>
+                <td class="text-mono fw-700">7</td>
+                <td>Sangat Jauh Lebih Penting</td>
+                <td>Satu elemen mendominasi</td>
+              </tr>
+              <tr>
+                <td class="text-mono fw-700">9</td>
+                <td>Mutlak Lebih Penting</td>
+                <td>Satu elemen mutlak dominan</td>
+              </tr>
+              <tr>
+                <td class="text-mono">2,4,6,8</td>
+                <td>Nilai Tengah</td>
+                <td>Kompromi antara dua nilai bersebelahan</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-group fade-up fade-up-2">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="tab-matrix">📋 Matriks Perbandingan</button>
+          <button class="tab-btn" data-tab="tab-hasil">📊 Hasil Perhitungan</button>
+          <button class="tab-btn" data-tab="tab-ranking">🏆 Perankingan</button>
+          <button class="tab-btn" data-tab="tab-teori">📚 Teori AHP</button>
+        </div>
+
+        <div id="tab-matrix" class="tab-content active">
+          <div class="card mb-24">
+            <div class="section-header">
+              <div class="section-title">Input Matriks Perbandingan Berpasangan</div>
+              <div style="display: flex; gap: 8px">
+                <button id="btn-reset" class="btn btn-outline btn-sm">🔄 Reset Default</button>
+                <button id="btn-hitung" class="btn btn-primary">⚡ Hitung AHP</button>
+              </div>
+            </div>
+
+            <div class="alert alert-info mb-16">ℹ️ Isi nilai perbandingan pada sel berwarna. Sel lainnya otomatis terisi sebagai <strong>reciprocal (1/nilai)</strong>. Gunakan skala Saaty 1–9.</div>
+
+            <div style="overflow-x: auto" id="matrix-form"></div>
+
+            <div class="mt-16" style="display: flex; gap: 8px; justify-content: flex-end">
+              <button id="btn-reset" class="btn btn-outline">🔄 Reset ke Default Laporan</button>
+              <button id="btn-hitung" class="btn btn-primary">⚡ Hitung & Tampilkan Hasil</button>
+            </div>
+          </div>
+
+          <div id="ahp-result"></div>
+        </div>
+
+        <div id="tab-hasil" class="tab-content">
+          <div class="card mb-24">
+            <div class="section-title mb-16">Matriks Normalisasi dan Bobot Prioritas</div>
+            <div style="overflow-x: auto">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>Kriteria</th>
+                    <th>C1</th>
+                    <th>C2</th>
+                    <th>C3</th>
+                    <th>C4</th>
+                    <th style="color: var(--accent-light)">Bobot (W)</th>
+                    <th style="color: var(--accent-light)">Bobot (%)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-normalisasi">
+                  <tr>
+                    <td colspan="7" class="text-center text-muted">Belum ada perhitungan...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="grid-3 mb-24">
+            <div class="card">
+              <div class="card-title">λ Maksimum</div>
+              <div id="val-lambda" class="card-value text-mono" style="font-size: 28px">-</div>
+              <div class="card-label">Eigen Value Maksimum</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Consistency Index (CI)</div>
+              <div id="val-ci" class="card-value text-mono" style="font-size: 28px">-</div>
+              <div class="card-label">CI = (λmax - n) / (n-1)</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Consistency Ratio (CR)</div>
+              <div id="val-cr" class="card-value text-mono" style="font-size: 28px">-</div>
+              <div class="card-label">CR = CI / RI(4) = CI / 0.90</div>
+            </div>
+          </div>
+
+          <div id="alert-cr-hasil" class="alert alert-info">Menunggu perhitungan AHP...</div>
+
+          <div class="card mt-16">
+            <div class="section-title mb-16">Visualisasi Bobot Prioritas</div>
+            <div id="chart-bobot"></div>
+          </div>
+        </div>
+
+        <div id="tab-ranking" class="tab-content">
+          <div class="card mb-24">
+            <div class="section-header">
+              <div class="section-title">Skala Transformasi Nilai (1–5)</div>
+            </div>
+            <div style="overflow-x: auto">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>Kode</th>
+                    <th>C1 (Jarak)</th>
+                    <th>C2 (Kepadatan)</th>
+                    <th>C3 (Luas)</th>
+                    <th>C4 (Harga)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>A1</th>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>3</td>
+                  </tr>
+                  <tr>
+                    <th>A2</th>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                  </tr>
+                  <tr>
+                    <th>A3</th>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>4</td>
+                    <td>5</td>
+                  </tr>
+                  <tr>
+                    <th>A4</th>
+                    <td class="text-accent fw-700">5</td>
+                    <td class="text-accent fw-700">5</td>
+                    <td>3</td>
+                    <td>2</td>
+                  </tr>
+                  <tr>
+                    <th>A5</th>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>5</td>
+                    <td>5</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-muted mt-16" style="font-size: 12px">
+              Aturan transformasi: Jarak lebih dekat → skor lebih tinggi. Kepadatan lebih tinggi → skor lebih tinggi. Luas lebih besar → skor lebih tinggi. Harga lebih murah → skor lebih tinggi.
+            </p>
+          </div>
+
+          <div class="card mb-24">
+            <div class="section-header">
+              <div class="section-title">Rumus Skor Akhir</div>
+            </div>
+            <div id="rumus-skor-akhir" style="background: var(--bg-panel); border-radius: 8px; padding: 16px; font-family: &quot;JetBrains Mono&quot;, monospace; font-size: 14px; color: var(--accent-light)">
+              S = (C1 × W1) + (C2 × W2) + (C3 × W3) + (C4 × W4)
+            </div>
+          </div>
+
+          <div class="card mb-24">
+            <div class="section-header">
+              <div class="section-title">Matriks Penilaian Akhir & Perankingan</div>
+            </div>
+            <div style="overflow-x: auto">
+              <table class="ranking-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Kode</th>
+                    <th>Lokasi</th>
+                    <th>C1</th>
+                    <th>C2</th>
+                    <th>C3</th>
+                    <th>C4</th>
+                    <th>Skor Akhir</th>
+                    <th>Kategori</th>
+                  </tr>
+                </thead>
+                <tbody id="ranking-tbody-hitung">
+                  <tr>
+                    <td colspan="9" class="text-center text-muted">Menunggu perhitungan...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-teori" class="tab-content">
+          <div class="grid-2 mb-24">
+            <div class="card">
+              <div class="section-title mb-16">Tentang Metode AHP</div>
+              <p style="font-size: 13px; line-height: 1.8; color: var(--text-muted)">
+                <strong style="color: var(--text)">Analytical Hierarchy Process (AHP)</strong> dikembangkan oleh Thomas L. Saaty (1980) sebagai metode pengambilan keputusan multikriteria yang terstruktur. AHP bekerja dengan menguraikan
+                masalah kompleks ke dalam hierarki tujuan, kriteria, dan alternatif, kemudian melakukan perbandingan berpasangan untuk menentukan prioritas.
+              </p>
+              <br />
+              <p style="font-size: 13px; line-height: 1.8; color: var(--text-muted)">
+                Keunggulan AHP terletak pada kemampuannya mengukur <strong style="color: var(--text)">Consistency Ratio (CR)</strong>
+                yang memvalidasi bahwa penilaian pembuat keputusan bersifat logis dan tidak bertentangan satu sama lain. Jika CR ≤ 0.1, hasil bobot dinyatakan konsisten dan valid.
+              </p>
+            </div>
+            <div class="card">
+              <div class="section-title mb-16">Langkah-Langkah AHP</div>
+              <ol style="font-size: 13px; line-height: 2; color: var(--text-muted); padding-left: 16px">
+                <li>Identifikasi masalah dan tujuan</li>
+                <li>Susun hierarki: Tujuan → Kriteria → Alternatif</li>
+                <li>Buat matriks perbandingan berpasangan</li>
+                <li>Normalisasi matriks</li>
+                <li>Hitung bobot prioritas (eigenvector)</li>
+                <li>Hitung λ_max (eigenvalue maksimum)</li>
+                <li>Hitung Consistency Index (CI)</li>
+                <li>Hitung Consistency Ratio (CR = CI/RI)</li>
+                <li>Validasi: CR ≤ 0.1 = konsisten</li>
+                <li>Hitung skor akhir tiap alternatif</li>
+                <li>Ranking alternatif berdasarkan skor</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="card mb-24">
+            <div class="section-title mb-16">4 Kriteria Penentuan Lokasi Parkir</div>
+            <div class="criteria-grid">
+              <div class="criteria-item">
+                <div class="criteria-label">📍 C1 — Bobot Tertinggi (46.5%)</div>
+                <div class="criteria-name">Jarak ke Pusat Keramaian</div>
+                <div class="criteria-weight">46.5%</div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px">Semakin dekat lahan ke pusat aktivitas (pasar, stasiun, mall), semakin tinggi nilainya. Jarak ideal: &lt; 300 meter dari pusat keramaian.</p>
+              </div>
+              <div class="criteria-item">
+                <div class="criteria-label">🚗 C2 — Bobot Kedua (27.7%)</div>
+                <div class="criteria-name">Tingkat Kepadatan Jalan</div>
+                <div class="criteria-weight" style="color: #74c69d">27.7%</div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px">Volume kendaraan harian di jalan sekitar lahan. Kepadatan tinggi menunjukkan kebutuhan parkir yang besar di area tersebut.</p>
+              </div>
+              <div class="criteria-item">
+                <div class="criteria-label">📐 C3 — Bobot Ketiga (16.0%)</div>
+                <div class="criteria-name">Luas Lahan Tersedia</div>
+                <div class="criteria-weight" style="color: #f4a261">16.0%</div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px">Kapasitas efektif lahan dalam m². Lahan yang lebih luas dapat menampung lebih banyak kendaraan dan mengurangi parkir liar di bahu jalan.</p>
+              </div>
+              <div class="criteria-item">
+                <div class="criteria-label">💰 C4 — Bobot Terendah (9.7%)</div>
+                <div class="criteria-name">Estimasi Harga Lahan</div>
+                <div class="criteria-weight" style="color: #e63946">9.7%</div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px">Berdasarkan NJOP (Nilai Jual Objek Pajak) atau harga pasar. Harga lebih murah mendapat skor lebih tinggi untuk efisiensi anggaran.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-title mb-16">Random Index (RI) — Saaty</div>
+            <div style="overflow-x: auto">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>n</th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                    <th>9</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>RI</th>
+                    <td>0.00</td>
+                    <td>0.00</td>
+                    <td>0.58</td>
+                    <td class="text-accent fw-700">0.90</td>
+                    <td>1.12</td>
+                    <td>1.24</td>
+                    <td>1.32</td>
+                    <td>1.41</td>
+                    <td>1.45</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-muted mt-16" style="font-size: 12px">* Penelitian ini menggunakan n=4 kriteria, sehingga RI = 0.90 (disorot). CR = CI / RI = 0.0192 / 0.90 = 0.0213</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer><strong>SPK Kantong Parkir Publik Bandung</strong> &nbsp;·&nbsp; Kelompok 12 — Adimas, M. Rizqi, Rafky, La Ode, M. Farhan &nbsp;·&nbsp; Informatika UTY 2026 &nbsp;·&nbsp; Metode AHP + Web GIS</footer>
+
+    <script src="/static/js/main.js"></script>
+  </body>
+</html>

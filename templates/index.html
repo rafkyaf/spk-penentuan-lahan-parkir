@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPK Parkir Bandung | Dashboard Web GIS</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+
+<body>
+  <!-- ════════════ NAVBAR ════════════ -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="/">
+      <div class="logo-icon">🅿</div>
+      <div>
+        <span class="brand-name">SPK Parkir Bandung</span>
+        <span class="brand-sub">Web GIS + AHP System</span>
+      </div>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="/" class="active">Dashboard</a></li>
+      <li><a href="/hitung">Perhitungan AHP</a></li>
+      <li><a href="#peta">Peta GIS</a></li>
+      <li><a href="#ranking">Ranking</a></li>
+    </ul>
+  </nav>
+
+  <!-- ════════════ PAGE HEADER ════════════ -->
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title fade-up">Sistem Pendukung Keputusan<br />Lokasi Kantong Parkir Publik</h1>
+      <p class="page-subtitle fade-up fade-up-1">Kota Bandung · Metode AHP · Berbasis Web GIS · Kelompok 12 UTY 2026</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- ════ STAT CARDS ════ -->
+    <div class="grid-4 mb-24 fade-up fade-up-2">
+      <div class="stat-card">
+        <div class="stat-icon green">🅿</div>
+        <div>
+          <div class="stat-number">5</div>
+          <div class="stat-desc">Alternatif Lahan</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">📊</div>
+        <div>
+          <div class="stat-number">4</div>
+          <div class="stat-desc">Kriteria AHP</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">⚡</div>
+        <div>
+          <div class="stat-number">0.014</div>
+          <div class="stat-desc">Consistency Ratio</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">🏆</div>
+        <div>
+          <div class="stat-number text-accent">A4</div>
+          <div class="stat-desc">Lokasi Terbaik</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ BOBOT KRITERIA OVERVIEW ════ -->
+    <div class="grid-2 mb-24">
+      <div class="card fade-up fade-up-2">
+        <div class="section-header">
+          <div class="section-title">Bobot Prioritas Kriteria AHP</div>
+        </div>
+        <div id="chart-bobot"></div>
+        <div class="mt-16 alert alert-success" style="margin-bottom: 0">✅ CR = 0.014 — Konsisten (CR ≤ 0,1)</div>
+      </div>
+
+      <div class="card fade-up fade-up-3">
+        <div class="section-header">
+          <div class="section-title">Informasi Sistem</div>
+        </div>
+        <div style="font-size: 13px; line-height: 1.8; color: var(--text-muted)">
+          <p style="margin-bottom: 12px">
+            Sistem ini membantu <strong style="color: var(--text)">Dinas Perhubungan Kota Bandung</strong> dalam
+            menentukan lokasi kantong parkir publik yang paling strategis menggunakan pendekatan
+            <strong style="color: var(--accent-light)">Analytical Hierarchy Process (AHP)</strong>.
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+            <div style="background: var(--bg-panel); border-radius: 8px; padding: 12px">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px">Metode
+              </div>
+              <div style="color: var(--text); font-weight: 600">AHP (Saaty, 2008)</div>
+            </div>
+            <div style="background: var(--bg-panel); border-radius: 8px; padding: 12px">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px">
+                Visualisasi</div>
+              <div style="color: var(--text); font-weight: 600">Leaflet.js WebGIS</div>
+            </div>
+            <div style="background: var(--bg-panel); border-radius: 8px; padding: 12px">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px">Backend
+              </div>
+              <div style="color: var(--text); font-weight: 600">Python + Flask</div>
+            </div>
+            <div style="background: var(--bg-panel); border-radius: 8px; padding: 12px">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px">Wilayah
+              </div>
+              <div style="color: var(--text); font-weight: 600">Kota Bandung</div>
+            </div>
+          </div>
+          <div class="mt-16">
+            <a href="/hitung" class="btn btn-primary" style="width: 100%; justify-content: center"> 🔢 Buka Kalkulator
+              AHP </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PETA GIS ════ -->
+    <div class="card mb-24 fade-up" id="peta">
+      <div class="section-header">
+        <div class="section-title">Peta Interaktif Lokasi Kandidat Parkir — Bandung</div>
+        <div style="display: flex; gap: 8px; align-items: center">
+          <span style="font-size: 11px; color: var(--text-muted)">Klik polygon untuk detail</span>
+        </div>
+      </div>
+
+      <div id="map"></div>
+
+      <!-- Legenda -->
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px">
+        <div class="legend">
+          <div class="legend-title">Tingkat Kelayakan</div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #1b4332"></div>
+            Sangat Layak (≥ 4.0)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #52b788"></div>
+            Layak (3.5 – 3.99)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f4a261"></div>
+            Cukup Layak (2.5 – 3.49)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #e63946"></div>
+            Tidak Layak (< 2.5) </div>
+          </div>
+          <div class="legend">
+            <div class="legend-title">Simbol Peta</div>
+            <div class="legend-item"><span style="font-size: 18px">🏪</span>Pusat Keramaian</div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: rgba(255, 255, 255, 0.3); border: 2px solid #fff"></div>
+              Area Kandidat Parkir
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card mb-24 fade-up">
+        <div class="section-header">
+          <div class="section-title">Tambah Lokasi Manual</div>
+        </div>
+        <form id="form-tambah-lokasi" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <input type="text" id="input-id" placeholder="Kode (contoh: A6)" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <input type="text" id="input-nama" placeholder="Nama Lokasi" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <input type="number" id="input-jarak" placeholder="Jarak (m)" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <input type="number" id="input-kepadatan" placeholder="Kepadatan (unit/hr)" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <input type="number" id="input-luas" placeholder="Luas Lahan (m²)" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <input type="number" id="input-harga" placeholder="Harga Lahan (Rp)" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <input type="text" id="input-lat" placeholder="Latitude (-6.9xxx)" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <input type="text" id="input-lng" placeholder="Longitude (107.6xxx)" required class="form-input"
+            style="padding:10px; border-radius:6px; background:#0d1117; color:#fff; border:1px solid rgba(255,255,255,0.1);">
+          <button type="submit" class="btn btn-primary" style="grid-column: span 2;">➕ Tambah Lokasi ke Peta</button>
+        </form>
+      </div>
+
+      <!-- ════ RANKING TABLE ════ -->
+      <div class="card mb-24 fade-up" id="ranking">
+        <div class="section-header">
+          <div class="section-title">Perankingan Lokasi (Hasil AHP)</div>
+          <a href="/hitung" class="btn btn-outline btn-sm">⚙️ Ubah Bobot</a>
+        </div>
+
+        <div style="overflow-x: auto">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Kode</th>
+                <th>Nama Lokasi</th>
+                <th style="min-width: 160px">Skor AHP</th>
+                <th>Kategori</th>
+              </tr>
+            </thead>
+            <tbody id="ranking-tbody">
+              <!-- Diisi oleh JavaScript -->
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted)">Memuat data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-16 alert alert-info" style="margin-bottom: 0">ℹ️ Skor dihitung dari: <strong>Skor = C1×0.465 +
+            C2×0.277 + C3×0.160 + C4×0.097</strong></div>
+      </div>
+
+      <!-- ════ DATA TABEL ALTERNATIF ════ -->
+      <div class="card mb-24 fade-up">
+        <div class="section-header">
+          <div class="section-title">Data Atribut Alternatif Lahan Parkir</div>
+        </div>
+        <div style="overflow-x: auto">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama Lokasi</th>
+                <th>Jarak Keramaian</th>
+                <th>Kepadatan Jalan</th>
+                <th>Luas Lahan</th>
+                <th>Harga Lahan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="atribut-tbody">
+              <tr>
+                <td colspan="6" class="text-center text-muted">Memuat data dinamis...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-muted mt-16" style="font-size: 12px">* Data bersumber dari observasi lapangan dan Open Data
+          Pemerintah Kota Bandung (portal.bandung.go.id)</p>
+      </div>
+    </div>
+    <!-- end container -->
+
+    <!-- ════════════ FOOTER ════════════ -->
+    <footer><strong>SPK Kantong Parkir Publik Bandung</strong> &nbsp;·&nbsp; Kelompok 12 — Adimas, M. Rizqi, Rafky, La
+      Ode, M. Farhan &nbsp;·&nbsp; Informatika UTY 2026 &nbsp;·&nbsp; Metode AHP + Web GIS</footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+
+</html>

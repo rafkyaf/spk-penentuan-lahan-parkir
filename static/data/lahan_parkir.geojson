@@ -1,0 +1,261 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "A1",
+        "nama": "Lahan Kosong Jl. Asia Afrika",
+        "jarak_keramaian": 50,
+        "kepadatan_jalan": 1500,
+        "luas_lahan": 1200,
+        "harga_lahan": 5000000,
+        "skala_jarak": 5,
+        "skala_kepadatan": 4,
+        "skala_luas": 3,
+        "skala_harga": 3,
+        "skor_akhir": 4.204,
+        "ranking": 2,
+        "kategori": "Sangat Layak",
+        "warna": "#2d6a4f"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              107.6069,
+              -6.9216
+            ],
+            [
+              107.6089,
+              -6.9216
+            ],
+            [
+              107.6089,
+              -6.9226
+            ],
+            [
+              107.6069,
+              -6.9226
+            ],
+            [
+              107.6069,
+              -6.9216
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "A2",
+        "nama": "Lahan Kosong Jl. Braga",
+        "jarak_keramaian": 200,
+        "kepadatan_jalan": 1200,
+        "luas_lahan": 800,
+        "harga_lahan": 8000000,
+        "skala_jarak": 4,
+        "skala_kepadatan": 3,
+        "skala_luas": 2,
+        "skala_harga": 1,
+        "skor_akhir": 3.108,
+        "ranking": 3,
+        "kategori": "Layak",
+        "warna": "#95d5b2"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              107.6092,
+              -6.9175
+            ],
+            [
+              107.6112,
+              -6.9175
+            ],
+            [
+              107.6112,
+              -6.9185
+            ],
+            [
+              107.6092,
+              -6.9185
+            ],
+            [
+              107.6092,
+              -6.9175
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "A3",
+        "nama": "Lahan Kosong Jl. Sudirman",
+        "jarak_keramaian": 500,
+        "kepadatan_jalan": 800,
+        "luas_lahan": 1500,
+        "harga_lahan": 3000000,
+        "skala_jarak": 2,
+        "skala_kepadatan": 2,
+        "skala_luas": 4,
+        "skala_harga": 5,
+        "skor_akhir": 2.609,
+        "ranking": 4,
+        "kategori": "Cukup Layak",
+        "warna": "#f4a261"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              107.6142,
+              -6.9142
+            ],
+            [
+              107.6162,
+              -6.9142
+            ],
+            [
+              107.6162,
+              -6.9152
+            ],
+            [
+              107.6142,
+              -6.9152
+            ],
+            [
+              107.6142,
+              -6.9142
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "A4",
+        "nama": "Lahan Kosong Jl. Kebon Kawung",
+        "jarak_keramaian": 150,
+        "kepadatan_jalan": 1800,
+        "luas_lahan": 1000,
+        "harga_lahan": 7000000,
+        "skala_jarak": 5,
+        "skala_kepadatan": 5,
+        "skala_luas": 3,
+        "skala_harga": 2,
+        "skor_akhir": 4.384,
+        "ranking": 1,
+        "kategori": "Sangat Layak",
+        "warna": "#1b4332"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              107.5968,
+              -6.9109
+            ],
+            [
+              107.5988,
+              -6.9109
+            ],
+            [
+              107.5988,
+              -6.9119
+            ],
+            [
+              107.5968,
+              -6.9119
+            ],
+            [
+              107.5968,
+              -6.9109
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "A5",
+        "nama": "Lahan Kosong Jl. Soekarno Hatta",
+        "jarak_keramaian": 800,
+        "kepadatan_jalan": 500,
+        "luas_lahan": 2000,
+        "harga_lahan": 2000000,
+        "skala_jarak": 1,
+        "skala_kepadatan": 1,
+        "skala_luas": 5,
+        "skala_harga": 5,
+        "skor_akhir": 2.027,
+        "ranking": 5,
+        "kategori": "Tidak Layak",
+        "warna": "#e63946"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              107.6312,
+              -6.9512
+            ],
+            [
+              107.6332,
+              -6.9512
+            ],
+            [
+              107.6332,
+              -6.9522
+            ],
+            [
+              107.6312,
+              -6.9522
+            ],
+            [
+              107.6312,
+              -6.9512
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "A6",
+        "nama": "Pasir Kaliki",
+        "jarak_keramaian": 100.0,
+        "kepadatan_jalan": 1000.0,
+        "luas_lahan": 500.0,
+        "harga_lahan": 6000000.0,
+        "skala_jarak": 5,
+        "skala_kepadatan": 2,
+        "skala_luas": 1,
+        "skala_harga": 2,
+        "skor_akhir": 0,
+        "ranking": 99,
+        "kategori": "Belum Dihitung",
+        "warna": "#888888"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.601267,
+          -6.906668
+        ]
+      }
+    }
+  ]
+}
